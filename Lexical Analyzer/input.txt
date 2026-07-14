@@ -1,1 +1,4 @@
-sum = a * (b - 10);
+char a = 'A';
+if(a == b){
+  printf("true"); // true value
+}

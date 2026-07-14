@@ -1,11 +1,10 @@
 #include<stdio.h>
-#include<stdlib.h>
 #include<string.h>
 
 int isKeyword(char token[]){
   char *keywords[] = {
     "int","float","double","char",
-    "printf","scanf",
+    "printf","scanf","main",
     "if","else",
     "for","while","do",
     "switch","case","break","default",
@@ -27,7 +26,8 @@ int isInteger(char token[]){
     return 0;
   }
 
-  for(int i=0;i<strlen(token);i++){
+  int n = strlen(token);
+  for(int i=0;i<n;i++){
     if(token[i] < 48 || token[i] > 57){
       return 0;
     }
@@ -44,7 +44,8 @@ int isFloat(char token[]){
     return 0;
   }
 
-  for(int i=0;i<strlen(token);i++){
+  int n = strlen(token);
+  for(int i=0;i<n;i++){
     if(token[i] == '.'){
       dotCount++;
     }else if(token[i] >= '0' && token[i] <= '9'){
@@ -63,30 +64,39 @@ int isFloat(char token[]){
 
 int isOperator(char ch, char type[]){
   if(ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '%'){
-    strcpy(type,"Arithmetic");
+    strcpy(type,"Arithmetic Operator");
     return 1;
-  }if(ch == '='){
-    strcpy(type,"Assignment");
+  }else if(ch == '='){
+    strcpy(type,"Assignment Operator");
     return 1;
-  }if(ch == '>' || ch == '<'){
-    strcpy(type,"Relational");
-    return 1;
-  }
-
-  return 0;
-}
-
-int isParenthesis(char ch){
-  if(ch == '{' || ch == '}' || ch == '[' || ch == ']' || ch == '(' || ch == ')'){
+  }else if(ch == '>' || ch == '<' || ch == '!'){
+    strcpy(type,"Relational Operator");
     return 1;
   }
 
   return 0;
 }
 
-int isDelimiter(char ch){
-  char type[20];
-  if(ch == ' ' || ch == ';' || isOperator(ch,type) || isParenthesis(ch)){
+int isParenthesis(char ch, char type[]){
+  if(ch == '{' || ch == '}' || ch == '(' || ch == ')'){
+    strcpy(type,"Paranthesis");
+    return 1;
+  }
+
+  return 0;
+}
+
+int isPunctuator(char ch,char type[]){
+  if(ch == ';' || ch == ',' || ch == ':'){
+    strcpy(type,"Punctuator");
+    return 1;
+  }
+
+  return 0;
+}
+
+int isDelimiter(char ch,char type[]){
+  if(ch == ' ' || ch == '\'' || ch == '\"' || isOperator(ch,type) || isParenthesis(ch,type) || isPunctuator(ch,type)){
     return 1;
   }
 
@@ -112,12 +122,12 @@ void printToken(char str[],int fp,int bp){
 void lexicalAnalyzer(char str[]){
   int fp = 0,bp = 0;
   int n = strlen(str);
-  char type[20];
+  char token[50],type[20];
 
   while(fp < n && bp < n){
     char ch = str[fp];
 
-    if(isDelimiter(ch)){
+    if(isDelimiter(ch,type)){
       if(bp != fp){
         printToken(str,fp,bp);
       }
@@ -126,19 +136,30 @@ void lexicalAnalyzer(char str[]){
       if(ch == ' '){
         fp++; 
         continue;
+      }else if(ch == '/' && (str[bp] == '/' || str[bp] == '*')){
+        return;
+      }else if(ch == '\''){
+        printf("\'%c\'\tCharacter\n",str[bp]);
+        bp += 2;
+        fp += 2;
+      }else if(ch == '\"'){
+        while(str[++fp] != '\"');
+        strncpy(token, str + bp, fp - bp);
+        token[fp - bp] = '\0';
+        printf("\"%s\"\tString\n",token);
+        bp = fp + 1;
+      }else if((ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '%') && str[bp] == '='){
+        printf("%c=\tAssignment Operator\n",ch);
+        bp++;
+        fp = bp - 1;
       }else if((ch == '>' || ch == '<' || ch == '=' || ch == '!') && str[bp] == '='){
         printf("%c=\tRelational Operator\n",ch);
         bp++;
-        fp = bp;
-      }else if(isOperator(ch,type)){
-        printf("%c\t%s Operator\n",ch,type);
-      }else if(isParenthesis(ch)){
-        printf("%c\tParenthesis\n",ch);
+        fp = bp - 1;
       }else{
-        printf("%c\tPunctuator\n",ch);
+        printf("%c\t%s\n",ch,type);
       }
     }
-
     fp++;
   }
 
