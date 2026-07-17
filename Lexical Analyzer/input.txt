@@ -1,4 +1,19 @@
-char a = 'A';
-if(a == b){
-  printf("true"); // true value
+int main(){
+  int a = 10;
+  float b = 20.5;
+
+  printf("Hello");
+
+  if(a >= 5){
+    a += 2;
+  }
+
+  // Single line comment
+
+  /*
+    Multi-line
+    Comment
+  */
+
+  return 0;
 }
