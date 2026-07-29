@@ -1,0 +1,18 @@
+#include<stdio.h>
+int main(){
+  //int a = 10;
+  float b<= 20.5;//Hello
+  if(a < b)
+    a = a * 1;
+    a += a * 1;
+    b = b++;
+    k += 10.8E7;
+  /* int a = 88;
+   float b=23;*/
+   return 0;
+}
+
+int sum(int x,int y)
+{
+  return x + y
+}

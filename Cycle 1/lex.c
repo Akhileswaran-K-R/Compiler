@@ -23,12 +23,12 @@ int isKeyword(char token[]){
 }
 
 int isNumber(char token[],char type[]){
-  int dotCount = 0,before = 0,after = 0,n = strlen(token);
+  int dotCount = 0,before = 0,after = 0,Ecount = 0,n = strlen(token);
 
   for(int i=0;i<n;i++){
     if(token[i] == '.'){
       dotCount++;
-      if(dotCount > 1){
+      if(dotCount > 1 || Ecount > 1){
         return 0;
       }
     }else if(isdigit(token[i])){
@@ -37,15 +37,20 @@ int isNumber(char token[],char type[]){
       }else{
         after++;
       }
+    }else if(token[i] == 'E'){
+      Ecount++;
+      if(Ecount  > 1){
+        return 0;
+      }
     }else{
       return 0;
     }
   }
 
-  if(dotCount == 0){
+  if(dotCount == 0 && Ecount == 0){
     strcpy(type,"Integer");
     return 1;
-  }else if(before > 0 && after > 0){
+  }else if((before > 0 && after > 0) || Ecount == 1){
     strcpy(type,"Float");
     return 1;
   }else{
@@ -84,7 +89,7 @@ int isOperator(char ch, char type[]){
 }
 
 int isParenthesis(char ch, char type[]){
-  if(strchr("{}()",ch)){
+  if(strchr("{}()[]",ch)){
     strcpy(type,"Parenthesis");
     return 1;
   }
@@ -102,7 +107,7 @@ int isPunctuator(char ch,char type[]){
 }
 
 int isDelimiter(char ch,char type[]){
-  if(strchr(" '\"",ch) || isOperator(ch,type) || isParenthesis(ch,type) || isPunctuator(ch,type)){
+  if(strchr(" \t'\"",ch) || isOperator(ch,type) || isParenthesis(ch,type) || isPunctuator(ch,type)){
     return 1;
   }
 
@@ -110,7 +115,7 @@ int isDelimiter(char ch,char type[]){
 }
 
 void printToken(char str[],int fp,int bp){
-  char token[50],type[20];
+  char token[1024],type[20];
   strncpy(token, str + bp, fp - bp);
   token[fp - bp] = '\0';
 
@@ -156,7 +161,7 @@ void lexicalAnalyzer(char str[],int *comment){
       }
 
       bp = fp + 1;
-      if(ch == ' '){
+      if(strchr(" \t",ch)){
         fp++; 
         continue;
       }else if(ch == '/'){
@@ -168,7 +173,14 @@ void lexicalAnalyzer(char str[],int *comment){
           continue;
         }
       }else if(ch == '\'' || ch == '"'){
-        while(str[++fp] != ch);
+        fp++;
+        while(str[fp] != ch){
+          if(str[fp] == '\\'){
+            fp += 2;
+          }else{
+            fp++;
+          }
+        }
         strncpy(token, str + bp, fp - bp);
         token[fp - bp] = '\0';
         printf("%c%s%c\t%s\n",ch,token,ch,(ch == '\'') ? "Character" : "String");
@@ -179,6 +191,10 @@ void lexicalAnalyzer(char str[],int *comment){
         fp++;
       }else if(strchr("><=!",ch) && str[bp] == '='){
         printf("%c=\tRelational Operator\n",ch);
+        bp++;
+        fp++;
+      }else if(strchr("+-",ch) && str[bp] == ch){
+        printf("%c%c\t%s Operator\n",ch,ch,(ch == '+') ? "Increment" : "Decrement");
         bp++;
         fp++;
       }else{
@@ -195,7 +211,7 @@ void lexicalAnalyzer(char str[],int *comment){
 
 void main(){
   FILE *fp = fopen("input.txt","r");
-  char line[100];
+  char line[1024];
   int comment = 0;
 
   while(fgets(line, sizeof(line), fp)){
