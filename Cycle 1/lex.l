@@ -1,6 +1,6 @@
 %{
-#include <stdio.h>
-#include <string.h>
+#include<stdio.h>
+#include<string.h>
 
 char *keywords[] = {
   "int","float","double","char",
@@ -14,9 +14,11 @@ char *keywords[] = {
 int isKeyword(char *str)
 {
   int n = sizeof(keywords) / sizeof(keywords[0]);
-  for(int i=0;i<n;i++)
-    if(strcmp(str,keywords[i])==0)
+  for(int i=0;i<n;i++){
+    if(strcmp(str,keywords[i]) == 0){
       return 1;
+    }
+  }
   return 0;
 }
 %}
@@ -53,10 +55,11 @@ CHAR        \'([^\\\n]|(\\.))\'
 {CHAR}                        { printf("%s\tCharacter\n",yytext); }
 
 {ID}                          {
-                                if(isKeyword(yytext))
-                                    printf("%s\tKeyword\n",yytext);
-                                else
-                                    printf("%s\tIdentifier\n",yytext);
+                                if(isKeyword(yytext)){
+                                  printf("%s\tKeyword\n",yytext);
+                                }else{
+                                  printf("%s\tIdentifier\n",yytext);
+                                }
                               }
 
 .                             { printf("%s\tUnknown\n",yytext); }
