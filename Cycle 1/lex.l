@@ -33,34 +33,23 @@ CHAR        \'([^\\\n]|(\\.))\'
 %%
 
 [ \t\n]+                      ;
-
 "//".*                        ;
-
 "/*"([^*]|\*+[^*/])*\*+"/"    ;
 
 "++"                          { printf("++\tIncrement Operator\n"); }
 "--"                          { printf("--\tDecrement Operator\n"); }
 
 "+="|"-="|"*="|"/="|"%="      { printf("%s\tAssignment Operator\n",yytext); }
-
 "=="|"!="|"<="|">="           { printf("%s\tRelational Operator\n",yytext); }
-
 ">"|"<"|"!"                   { printf("%s\tRelational Operator\n",yytext); }
-
 "="                           { printf("=\tAssignment Operator\n"); }
-
 "+"|"-"|"*"|"/"|"%"           { printf("%s\tArithmetic Operator\n",yytext); }
-
 "("|")"|"{"|"}"|"["|"]"       { printf("%s\tParenthesis\n",yytext); }
-
 ";"|","|":"                   { printf("%s\tPunctuator\n",yytext); }
 
 {FLOAT}                       { printf("%s\tFloat\n",yytext); }
-
 {INT}                         { printf("%s\tInteger\n",yytext); }
-
 {STRING}                      { printf("%s\tString\n",yytext); }
-
 {CHAR}                        { printf("%s\tCharacter\n",yytext); }
 
 {ID}                          {
