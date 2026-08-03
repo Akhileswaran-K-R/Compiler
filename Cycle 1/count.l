@@ -10,7 +10,7 @@ int charac = 0;
 
 \n          { line++; }
 [^\t\n ]+   { word++; charac += yyleng; }
-.           { charac++; }
+.
 
 %%
 
