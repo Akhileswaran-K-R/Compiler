@@ -1,9 +1,9 @@
 %{
-#include<stdio.h>
+  #include<stdio.h>
 
-int line = 0;
-int word = 0;
-int charac = 0;
+  int line = 0;
+  int word = 0;
+  int charac = 0;
 %}
 
 %%

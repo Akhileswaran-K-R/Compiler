@@ -1,25 +1,25 @@
 %{
-#include<stdio.h>
-#include<string.h>
+  #include<stdio.h>
+  #include<string.h>
 
-int isKeyword(char str[]){
-  char *keywords[] = {
-    "int","float","double","char",
-    "printf","scanf","main",
-    "if","else",
-    "for","while","do",
-    "switch","case","break","default",
-    "continue","return"
-  };
+  int isKeyword(char str[]){
+    char *keywords[] = {
+      "int","float","double","char",
+      "printf","scanf","main",
+      "if","else",
+      "for","while","do",
+      "switch","case","break","default",
+      "continue","return"
+    };
 
-  int n = sizeof(keywords) / sizeof(keywords[0]);
-  for(int i=0;i<n;i++){
-    if(strcmp(str,keywords[i]) == 0){
-      return 1;
+    int n = sizeof(keywords) / sizeof(keywords[0]);
+    for(int i=0;i<n;i++){
+      if(strcmp(str,keywords[i]) == 0){
+        return 1;
+      }
     }
+    return 0;
   }
-  return 0;
-}
 %}
 
 LETTER      [a-zA-Z_]

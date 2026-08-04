@@ -1,12 +1,12 @@
 %{
-#include<stdio.h>
-#include<stdlib.h>
+  #include<stdio.h>
+  #include<stdlib.h>
 
-void yyerror(char *s){
-  printf("Invalid arithmetic expression\n");
-}
+  void yyerror(char *s){
+    printf("Invalid arithmetic expression\n");
+  }
 
-int yylex(void);
+  int yylex(void);
 %}
 
 %token NUM
@@ -16,6 +16,10 @@ int yylex(void);
 %right UMINUS
 
 %%
+
+S : 
+  | S E '\n'                 { printf("Valid arithmetic expression\n"); }
+  | S error '\n'             { yyerrok; }
 
 E : E '+' E 
   | E '-' E 
@@ -29,7 +33,5 @@ E : E '+' E
 
 void main(){
   printf("Enter an arithmetic expression:\n");
-  if(yyparse() == 0){
-    printf("Valid arithmetic expression\n");
-  }
+  yyparse();
 }

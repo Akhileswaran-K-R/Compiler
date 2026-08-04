@@ -1,12 +1,12 @@
 %{
-#include "y.tab.h"
+  #include "y.tab.h"
 %}
 
 %%
 
-[0-9]+     { yylval = atoi(yytext); return NUM; }
-[ \t]+ 
-\n         return 0;
+[0-9]+     { return NUM; }
+[ \t]+     
+\n         return '\n';
 [-+*/()]   return yytext[0];
 .          return yytext[0];
 

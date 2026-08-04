@@ -28,7 +28,7 @@ int isNumber(char token[],char type[]){
   for(int i=0;i<n;i++){
     if(token[i] == '.'){
       dotCount++;
-      if(dotCount > 1 || Ecount > 1){
+      if(dotCount > 1 || Ecount > 0){
         return 0;
       }
     }else if(isdigit(token[i])){
