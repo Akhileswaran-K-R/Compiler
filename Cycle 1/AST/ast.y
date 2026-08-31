@@ -1,9 +1,14 @@
 %{
   #include <stdio.h>
   #include <stdlib.h>
-  #include "ast.h"
 
-  Node *newNode(char data, Node *left, Node *right){
+  typedef struct Node{
+    char data;
+    struct Node *left;
+    struct Node *right;
+  }Node;
+
+  Node *createNode(char data, Node *left, Node *right){
     Node *newNode = (Node*)malloc(sizeof(Node));
 
     newNode->data = data;
@@ -29,7 +34,7 @@
 %}
 
 %union{
-  Node *ptr;
+  struct Node *ptr;
   char id;
 }
 
@@ -49,12 +54,12 @@ S :
                   }
   | S error '\n'  { yyerrok; }
 
-E : E '+' E       { $$ = newNode('+',$1,$3); }
-  | E '-' E       { $$ = newNode('-',$1,$3); }
-  | E '*' E       { $$ = newNode('*',$1,$3); }
-  | E '/' E       { $$ = newNode('/',$1,$3); }
+E : E '+' E       { $$ = createNode('+',$1,$3); }
+  | E '-' E       { $$ = createNode('-',$1,$3); }
+  | E '*' E       { $$ = createNode('*',$1,$3); }
+  | E '/' E       { $$ = createNode('/',$1,$3); }
   | '(' E ')'     { $$ = $2; }
-  | ID            { $$ = newNode($1,NULL,NULL); }
+  | ID            { $$ = createNode($1,NULL,NULL); }
 
 %%
 
