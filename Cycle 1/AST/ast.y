@@ -18,11 +18,28 @@
     return newNode;
   }
 
-  void preorder(Node *root){
-    if(root != NULL){
-      printf("%c ", root->data);
-      preorder(root->left);
-      preorder(root->right);
+  void levelOrder(Node *root){
+    Node *queue[100];
+    int front = 0,rear = 0;
+    queue[rear++] = root;
+
+    while(front < rear){
+      int nodesInLevel = rear - front;
+
+      while(nodesInLevel > 0){
+        Node *current = queue[front++];
+        printf("%c ",current->data);
+
+        if(current->left != NULL){
+          queue[rear++] = current->left;
+        }
+
+        if(current->right != NULL){
+          queue[rear++] = current->right;
+        }
+        nodesInLevel--; 
+      }
+      printf("\n");
     }
   }
 
@@ -48,8 +65,8 @@
 
 S : 
   | S E '\n'      {
-                    printf("Preorder Traversal of AST: ");
-                    preorder($2);
+                    printf("\n");
+                    levelOrder($2);
                     printf("\n\n");
                   }
   | S error '\n'  { yyerrok; }

@@ -50,17 +50,7 @@ int findDFAState(DFA dfa[],DFA s,int dfaCount){
   return -1;
 }
 
-
-void main(){
-  int states,inputs;
-  printf("Enter the no: of states: ");
-  scanf("%d",&states);
-  printf("Enter the no: of input symbols: ");
-  scanf("%d",&inputs);
-
-  int nfa[states][inputs][states];
-  int nfaCount[states][inputs];
-
+void acceptNFA(int states,int inputs,int nfa[][inputs][states],int nfaCount[][inputs]){
   printf("\nEnter transitions:\n");
 
   for(int i=0;i<states;i++){
@@ -69,27 +59,25 @@ void main(){
       printf("Number of transitions from q%d on input %d: ", i, j);
       scanf("%d", &nfaCount[i][j]);
 
+      if(nfaCount[i][j] > 0){
+        printf("Destination states: ");
+      }
       for(int k=0;k<nfaCount[i][j];k++){
         scanf("%d", &nfa[i][j][k]);
       }
     }
   }
+}
 
-  DFA dfa[1 << states],start;
-  int dfaCount = 0;
-
-  start.count = 1;
-  start.states[0] = 0;
-  dfa[dfaCount++] = start;
-  
+void conversion(int states,int inputs,int nfa[][inputs][states],int nfaCount[][inputs],DFA dfa[],int dfaCount){
   printf("\nDFA Transition Table:\n");
 
   for(int i=0;i<dfaCount;i++){
-    printf("\nState { ");
+    printf("\nState [ ");
     for(int j=0;j<dfa[i].count;j++){
       printf("q%d ", dfa[i].states[j]);
     }
-    printf("}\n");
+    printf("]\n");
 
     for(int j=0;j<inputs;j++){
       DFA next;
@@ -113,11 +101,30 @@ void main(){
         dfa[dfaCount++] = next;
       }
 
-      printf("  On symbol %d -> { ", j);
+      printf("  On input %d -> [ ", j);
       for(int k=0;k<next.count;k++){
         printf("q%d ", next.states[k]);
       }
-      printf("}\n");
+      printf("]\n");
     }
   }
+}
+
+void main(){
+  int states,inputs;
+  printf("Enter the no: of states: ");
+  scanf("%d",&states);
+  printf("Enter the no: of input symbols: ");
+  scanf("%d",&inputs);
+
+  int nfa[states][inputs][states];
+  int nfaCount[states][inputs];
+  acceptNFA(states,inputs,nfa,nfaCount);
+
+  DFA dfa[1 << states];
+  int dfaCount = 0;
+
+  dfa[dfaCount].count = 1;
+  dfa[dfaCount++].states[0] = 0;
+  conversion(states,inputs,nfa,nfaCount,dfa,dfaCount);
 }
