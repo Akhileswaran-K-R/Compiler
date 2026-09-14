@@ -5,9 +5,9 @@
 typedef struct{
   int states[MAXSTATES];
   int count;
-}DFA;
+}FA;
 
-void sortState(DFA *s){
+void sortState(FA *s){
   for(int i=0;i<s->count-1;i++){
     for(int j=0;j<s->count-i-1;j++){
       if(s->states[j] > s->states[j+1]){
@@ -19,7 +19,7 @@ void sortState(DFA *s){
   }
 }
 
-int alreadyIn(DFA a,int b){
+int alreadyIn(FA a,int b){
   for(int i=0;i<a.count;i++){
     if(a.states[i] == b){
       return 1;
@@ -28,7 +28,7 @@ int alreadyIn(DFA a,int b){
   return 0;
 }
 
-int compareStates(DFA a, DFA b){
+int compareStates(FA a, FA b){
   if(a.count != b.count){
     return 0;
   }
@@ -41,7 +41,7 @@ int compareStates(DFA a, DFA b){
   return 1;
 }
 
-int findDFAState(DFA dfa[],DFA s,int dfaCount){
+int findDFAState(FA dfa[],FA s,int dfaCount){
   for(int i=0;i<dfaCount;i++){
     if(compareStates(dfa[i],s)){
       return i;
@@ -50,26 +50,26 @@ int findDFAState(DFA dfa[],DFA s,int dfaCount){
   return -1;
 }
 
-void acceptNFA(int states,int inputs,int nfa[][inputs][states],int nfaCount[][inputs]){
+void acceptNFA(int states,int inputs,FA nfa[][inputs]){
   printf("\nEnter transitions:\n");
 
   for(int i=0;i<states;i++){
     printf("\n");
     for(int j=0;j<inputs;j++){
       printf("Number of transitions from q%d on input %d: ", i, j);
-      scanf("%d", &nfaCount[i][j]);
+      scanf("%d", &nfa[i][j].count);
 
-      if(nfaCount[i][j] > 0){
+      if(nfa[i][j].count > 0){
         printf("Destination states: ");
       }
-      for(int k=0;k<nfaCount[i][j];k++){
-        scanf("%d", &nfa[i][j][k]);
+      for(int k=0;k<nfa[i][j].count;k++){
+        scanf("%d", &nfa[i][j].states[k]);
       }
     }
   }
 }
 
-void conversion(int states,int inputs,int nfa[][inputs][states],int nfaCount[][inputs],DFA dfa[],int dfaCount){
+void conversion(int states,int inputs,FA nfa[][inputs],FA dfa[],int dfaCount){
   printf("\nDFA Transition Table:\n");
 
   for(int i=0;i<dfaCount;i++){
@@ -80,14 +80,14 @@ void conversion(int states,int inputs,int nfa[][inputs][states],int nfaCount[][i
     printf("]\n");
 
     for(int j=0;j<inputs;j++){
-      DFA next;
+      FA next;
       next.count = 0;
 
       for(int k=0;k<dfa[i].count;k++){
         int current = dfa[i].states[k];
 
-        for(int l=0;l<nfaCount[current][j];l++){
-          int ns = nfa[current][j][l];
+        for(int l=0;l<nfa[current][j].count;l++){
+          int ns = nfa[current][j].states[l];
 
           if(!alreadyIn(next,ns)){
             next.states[next.count++] = ns;
@@ -111,20 +111,16 @@ void conversion(int states,int inputs,int nfa[][inputs][states],int nfaCount[][i
 }
 
 void main(){
-  int states,inputs;
+  int states,inputs,dfaCount = 0;
   printf("Enter the no: of states: ");
   scanf("%d",&states);
   printf("Enter the no: of input symbols: ");
   scanf("%d",&inputs);
 
-  int nfa[states][inputs][states];
-  int nfaCount[states][inputs];
-  acceptNFA(states,inputs,nfa,nfaCount);
-
-  DFA dfa[1 << states];
-  int dfaCount = 0;
+  FA nfa[states][inputs],dfa[1 << states];
+  acceptNFA(states,inputs,nfa);
 
   dfa[dfaCount].count = 1;
   dfa[dfaCount++].states[0] = 0;
-  conversion(states,inputs,nfa,nfaCount,dfa,dfaCount);
+  conversion(states,inputs,nfa,dfa,dfaCount);
 }
