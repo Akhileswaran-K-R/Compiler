@@ -42,7 +42,6 @@ int minimize(int states,int inputs,int delta[][inputs],int group[]){
           if(group[delta[rep][j]] != group[delta[i][j]]){
             temp[count++] = i;
             split = 1;
-            changed = 1;
             break;
           }
         }
@@ -54,6 +53,7 @@ int minimize(int states,int inputs,int delta[][inputs],int group[]){
 
       if(split){
         newgrp++;
+        changed = 1;
       }
     }
   }while(changed);
@@ -61,9 +61,9 @@ int minimize(int states,int inputs,int delta[][inputs],int group[]){
   return newgrp;
 }
 
-void display(int newgrp,int states,int group[]){
+void display(int totalgrp,int states,int group[]){
   printf("\nMinimized DFA\n\n");
-  for(int i=0;i<newgrp;i++){
+  for(int i=0;i<totalgrp;i++){
     printf("Group %c: [ ",i+65);
     for(int j=0;j<states;j++){
       if(i == group[j]){
@@ -75,7 +75,7 @@ void display(int newgrp,int states,int group[]){
 }
 
 void main(){
-  int states,inputs,temp,f,newgrp = 2;
+  int states,inputs,temp,f,totalgrp;
   printf("Enter the no: of states: ");
   scanf("%d",&states);
   printf("Enter the no: of inputs: ");
@@ -95,6 +95,6 @@ void main(){
     group[temp] = 1;
   }
 
-  newgrp = minimize(states,inputs,delta,group);
-  display(newgrp,states,group);
+  totalgrp = minimize(states,inputs,delta,group);
+  display(totalgrp,states,group);
 }
