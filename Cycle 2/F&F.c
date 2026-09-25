@@ -1,7 +1,35 @@
 #include<stdio.h>
 #include<string.h>
 #include<ctype.h>
+#define MAXPROD 20
 #define MAXSIZE 100
+
+int accept(int m,char prods[][MAXSIZE]){
+  char temp[MAXSIZE];
+  int n=0;
+  for(int i=0;i<m;i++){
+    fgets(temp, sizeof(temp), stdin); 
+    temp[strcspn(temp, "\n")] = '\0';
+    char lhs = temp[0];
+
+    int j;
+    for(j=1;j<strlen(temp);j++){
+      if(strchr(" ->=",temp[j]) == NULL){
+        break;
+      }
+    }
+
+    char *str = strtok(temp+j,"| ");
+    while(str != NULL){
+      prods[n][0] = lhs;
+      prods[n][1] = '=';
+      strcat(prods[n],str);
+      n++;
+      str = strtok(NULL,"| ");
+    }
+  }
+  return n;
+}
 
 void add(char symbol,char result[]){
   if(strchr(result,symbol) == NULL){
@@ -21,7 +49,7 @@ int findFirst(char symbol,char result[],int n,char prods[][MAXSIZE],int level){
     return 0;
   }
 
-  int allEpsilon = 0;
+  int isNullable = 0;
   for(int i=0;i<n;i++){
     if(prods[i][0] != symbol){
       continue;
@@ -35,13 +63,13 @@ int findFirst(char symbol,char result[],int n,char prods[][MAXSIZE],int level){
     }
 
     if(epsilon == 1){
-      allEpsilon = 1;
+      isNullable = 1;
       if(level == 0){
         add('#',result);
       }
     }
   }
-  return allEpsilon;
+  return isNullable;
 }
 
 void findFollow(char symbol,char result[],int n,char prods[][MAXSIZE],char first[][MAXSIZE],int visited[]){
@@ -61,28 +89,32 @@ void findFollow(char symbol,char result[],int n,char prods[][MAXSIZE],char first
         continue;
       }
 
-      int index = prods[i][j+1] - 'A';
-      if(j + 1 == len && prods[i][0] != symbol){
-        findFollow(prods[i][0],result,n,prods,first,visited);
-      }else if(!isupper(prods[i][j+1])){
-        add(prods[i][j+1],result);
-      }else if(strchr(first[index],'#')){
-        for(int k=0;k<strlen(first[index]);k++){
-          if(first[index][k] != '#')
-          add(first[index][k],result);
+      int isNullable = 1,k;
+      for(k=j+1;k<len && isNullable;k++){
+        char nxt = prods[i][k];
+        if(!isupper(nxt)){
+          add(nxt,result);
+          isNullable = 0;
+        }else{
+          isNullable = 0;
+          for(int l=0;l<strlen(first[nxt - 'A']);l++){
+            if(first[nxt - 'A'][l] == '#'){
+              isNullable = 1;
+            }else{
+              add(first[nxt - 'A'][l],result);
+            }
+          }
         }
+      }
 
-        if(prods[i][0] != symbol){
-          findFollow(prods[i][0],result,n,prods,first,visited);
-        }
-      }else{
-        strcat(result,first[index]);
+      if(k == len && isNullable && prods[i][0] != symbol){
+        findFollow(prods[i][0],result,n,prods,first,visited);
       }
     }
   }
 }
 
-void display(int n,char prods[][MAXSIZE],char first[][MAXSIZE],char title[]){
+void display(int n,char prods[][MAXSIZE],char result[][MAXSIZE],char title[]){
   printf("\n\n%s\n",title);
   for(int i=0;i<n;i++){
     char symbol = prods[i][0];
@@ -97,8 +129,8 @@ void display(int n,char prods[][MAXSIZE],char first[][MAXSIZE],char title[]){
 
     if(!alreadyPrinted){
       printf("%s(%c) = { ",title,symbol);
-      for(int j=0;j<strlen(first[symbol - 'A']);j++){
-        printf("%c ",first[symbol - 'A'][j]);
+      for(int j=0;j<strlen(result[symbol - 'A']);j++){
+        printf("%c ",result[symbol - 'A'][j]);
       }
       printf("}\n");
     }
@@ -106,15 +138,14 @@ void display(int n,char prods[][MAXSIZE],char first[][MAXSIZE],char title[]){
 }
 
 void main(){
-  int n;
-  printf("Enter the no: of productions\n");
-  scanf("%d",&n);
+  int m;
+  printf("Enter the no: of production statements\n");
+  scanf("%d",&m);
+  getchar();
 
-  char prods[n][MAXSIZE];
-  printf("\nEnter the productions\n");
-  for(int i=0;i<n;i++){
-    scanf("%s",prods[i]);
-  }
+  char prods[MAXPROD][MAXSIZE];
+  printf("\nEnter the productions(# for epsilon)\n");
+  int n = accept(m,prods);
 
   char first[26][MAXSIZE] = {0};
   char follow[26][MAXSIZE] = {0};
