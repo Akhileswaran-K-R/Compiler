@@ -27,7 +27,7 @@ int Tprime(char input[],int pos){
     return pos;
   }
 
-  if(input[pos] == '*'){
+  if(input[pos] == '&'){
     pos++;
     pos = F(input,pos);
     pos = Tprime(input,pos);
@@ -46,7 +46,7 @@ int Eprime(char input[],int pos){
     return pos;
   }
 
-  if(input[pos] == '+'){
+  if(input[pos] == '|'){
     pos++;
     pos = T(input,pos);
     pos = Eprime(input,pos);

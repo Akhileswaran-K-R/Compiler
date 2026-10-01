@@ -8,8 +8,7 @@ int accept(int m,char prods[][MAXSIZE]){
   char temp[MAXSIZE];
   int n=0;
   for(int i=0;i<m;i++){
-    fgets(temp, sizeof(temp), stdin); 
-    temp[strcspn(temp, "\n")] = '\0';
+    scanf(" %[^\n]",temp);
     char lhs = temp[0];
 
     int j;
@@ -23,6 +22,7 @@ int accept(int m,char prods[][MAXSIZE]){
     while(str != NULL){
       prods[n][0] = lhs;
       prods[n][1] = '=';
+      prods[n][2] = '\0';
       strcat(prods[n],str);
       n++;
       str = strtok(NULL,"| ");
@@ -141,9 +141,8 @@ void main(){
   int m;
   printf("Enter the no: of production statements\n");
   scanf("%d",&m);
-  getchar();
 
-  char prods[MAXPROD][MAXSIZE];
+  char prods[MAXPROD][MAXSIZE] = {0};
   printf("\nEnter the productions(# for epsilon)\n");
   int n = accept(m,prods);
 
