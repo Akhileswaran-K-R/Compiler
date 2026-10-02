@@ -34,8 +34,7 @@ int accept(int m,char prods[][MAXSIZE]){
     while(str != NULL){
       prods[n][0] = lhs;
       prods[n][1] = '=';
-      prods[n][2] = '\0';
-      strcat(prods[n],str);
+      strcpy(prods[n] + 2,str);
       n++;
       str = strtok(NULL,"| ");
     }
@@ -62,19 +61,19 @@ void display(char input[],table *t){
   }
 }
 
-int srp(int n,char prods[][MAXSIZE],char input[],int pos,stack s,table t){
-  if(input[pos] == '\0' && s.top == 0 && s.st[0] == prods[0][0]){
-    display(input,&t);
+int srp(int n,char prods[][MAXSIZE],char input[],int pos,stack *s,table *t){
+  if(input[pos] == '\0' && s->top == 0 && s->st[0] == prods[0][0]){
+    display(input,t);
     return 1;
   }
 
   for(int i=0;i<n;i++){
     int rhsLen = strlen(prods[i]) - 2;
-    int stackLen = s.top + 1;
+    int stackLen = s->top + 1;
 
-    if(stackLen >= rhsLen && strncmp(s.st + stackLen - rhsLen,prods[i] + 2,rhsLen) == 0){
-      stack nextS = s;
-      table nextT = t;
+    if(stackLen >= rhsLen && strncmp(s->st + stackLen - rhsLen,prods[i] + 2,rhsLen) == 0){
+      stack nextS = *s;
+      table nextT = *t;
 
       nextS.top -= rhsLen;
       nextS.st[++nextS.top] = prods[i][0];
@@ -83,20 +82,17 @@ int srp(int n,char prods[][MAXSIZE],char input[],int pos,stack s,table t){
       snprintf(action,sizeof(action),"REDUCE %c -> %s",prods[i][0],prods[i] + 2);
       record(pos,action,&nextS,&nextT);
 
-      if(srp(n,prods,input,pos,nextS,nextT)){
+      if(srp(n,prods,input,pos,&nextS,&nextT)){
         return 1;
       }
     }
   }
 
   if(input[pos] != '\0'){
-    stack nextS = s;
-    table nextT = t;
+    s->st[++s->top] = input[pos];
+    record(pos+1,"SHIFT",s,t);
 
-    nextS.st[++nextS.top] = input[pos];
-    record(pos+1,"SHIFT",&nextS,&nextT);
-
-    if(srp(n,prods,input,pos + 1,nextS,nextT)){
+    if(srp(n,prods,input,pos + 1,s,t)){
       return 1;
     }
   }
@@ -120,7 +116,7 @@ void main(){
   s.top = -1;
   t.steps = 0;
   
-  if(srp(n,prods,input,0,s,t)){
+  if(srp(n,prods,input,0,&s,&t)){
     printf("\nString accepted\n");
   }else{
     printf("\nString rejected\n");

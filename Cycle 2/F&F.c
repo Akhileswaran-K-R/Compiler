@@ -22,8 +22,7 @@ int accept(int m,char prods[][MAXSIZE]){
     while(str != NULL){
       prods[n][0] = lhs;
       prods[n][1] = '=';
-      prods[n][2] = '\0';
-      strcat(prods[n],str);
+      strcpy(prods[n] + 2,str);
       n++;
       str = strtok(NULL,"| ");
     }
