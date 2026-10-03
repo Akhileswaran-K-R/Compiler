@@ -72,19 +72,20 @@ int srp(int n,char prods[][MAXSIZE],char input[],int pos,stack *s,table *t){
     int stackLen = s->top + 1;
 
     if(stackLen >= rhsLen && strncmp(s->st + stackLen - rhsLen,prods[i] + 2,rhsLen) == 0){
-      stack nextS = *s;
-      table nextT = *t;
-
-      nextS.top -= rhsLen;
-      nextS.st[++nextS.top] = prods[i][0];
+      s->top -= rhsLen;
+      s->st[++s->top] = prods[i][0];
 
       char action[40];
       snprintf(action,sizeof(action),"REDUCE %c -> %s",prods[i][0],prods[i] + 2);
-      record(pos,action,&nextS,&nextT);
+      record(pos,action,s,t);
 
-      if(srp(n,prods,input,pos,&nextS,&nextT)){
+      if(srp(n,prods,input,pos,s,t)){
         return 1;
       }
+
+      strncpy(s->st + s->top,prods[i] + 2,rhsLen);
+      s->top += rhsLen - 1;
+      t->steps--;
     }
   }
 
@@ -95,6 +96,9 @@ int srp(int n,char prods[][MAXSIZE],char input[],int pos,stack *s,table *t){
     if(srp(n,prods,input,pos + 1,s,t)){
       return 1;
     }
+
+    s->top--;
+    t->steps--;
   }
   return 0;
 }
