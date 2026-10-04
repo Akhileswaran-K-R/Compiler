@@ -16,8 +16,7 @@ void trim(char str[]){
 }
 
 int conditional(char line[],char result[][MAX],int m){
-  char cond[MAX],label[MIN];
-  char id1[MIN],id2[MIN],op[4];
+  char cond[MAX],label[MIN],id1[MIN],id2[MIN],jmp[4];
   char *p,*g;
   int len,i,isFalse = 0;
 
@@ -35,15 +34,16 @@ int conditional(char line[],char result[][MAX],int m){
   strncpy(cond,p,len);
   cond[len] = '\0';
 
-  char *ops[] = {"<=", ">=", "==", "!=", "<", ">"};
+  char *ops[] = {"<=",">=","==","!=","<",">"};
+  char *jmps[] = {"JLE","JGE","JE","JNE","JL","JG"};
   for(i=0;i<6;i++){
     char *q = strstr(cond,ops[i]);
     if(q != NULL){
-      strcpy(op, ops[i]);
+      strcpy(jmp,jmps[i]);
       len = q - cond;
       strncpy(id1,cond,len);
       id1[len] = '\0';
-      strcpy(id2,q + strlen(op));
+      strcpy(id2,q + strlen(ops[i]));
       break;
     }
   }
@@ -52,34 +52,17 @@ int conditional(char line[],char result[][MAX],int m){
     sprintf(result[m++],"MOV AX,%s",cond);
     strcpy(result[m++],"CMP AX,0");
     sprintf(result[m++],"%s %s\n",isFalse ? "JE" : "JNE",label);
-    return m;
+  }else{
+    sprintf(result[m++], "MOV AX,%s", id1);
+    sprintf(result[m++], "CMP AX,%s", id2);
+    sprintf(result[m++],"%s %s\n",jmp,label);
   }
-
-  sprintf(result[m++], "MOV AX,%s", id1);
-  sprintf(result[m++], "CMP AX,%s", id2);
-
-  if(strcmp(op,"<") == 0){
-    strcpy(op,"JL");
-  }else if (strcmp(op, ">") == 0){
-    strcpy(op,"JG");
-  }else if (strcmp(op, "<=") == 0){
-    strcpy(op,"JLE");
-  }else if (strcmp(op, ">=") == 0){
-    strcpy(op,"JGE");
-  }else if (strcmp(op, "==") == 0){
-    strcpy(op,"JE");
-  }else if (strcmp(op, "!=") == 0){
-    strcpy(op,"JNE");
-  }
-
-  sprintf(result[m++],"%s %s\n",op,label);
   return m;
 }
 
 int unconditional(char line[],char result[][MAX],int m){
   char label[MIN];
   if(sscanf(line,"goto%s",label) == 1){
-    trim(label);
     sprintf(result[m++],"JMP %s\n",label);
   }
   return m;
@@ -120,7 +103,7 @@ void display(char result[][MAX],int m){
 }
 
 void main(){
-  char line[MAX],result[MAX][MAX],*str;
+  char line[MAX],result[MAX][MAX],label[MIN],rest[MAX];
   int n,m = 0;
 
   printf("Enter the no: of TAC statements:\n");
@@ -134,25 +117,21 @@ void main(){
     trim(line);
 
     if(strchr(line,':')){
-      str = strtok(line,":");
-      sprintf(result[m++],"%s:",str);
-
-      str = strtok(NULL,":");
-      if(str != NULL){
-        strcpy(line,str);
-      }else{
-        line[0] = '\0';
+      if(sscanf(line,"%[^:]:%s",label,rest) == 2){
+        sprintf(result[m++],"%s:",label);
+        strcpy(line,rest);
+      }else if(sscanf(line,"%[^:]:",label) == 1){
+        sprintf(result[m++],"%s:",label);
+        continue;
       }
     }
 
-    if(strlen(line) > 0){
-      if(strstr(line,"if")){
-        m = conditional(line,result,m);
-      }else if(strstr(line,"goto")){
-        m = unconditional(line,result,m);
-      }else{
-        m = expr(line,result,m);
-      }
+    if(strstr(line,"if")){
+      m = conditional(line,result,m);
+    }else if(strstr(line,"goto")){
+      m = unconditional(line,result,m);
+    }else{
+      m = expr(line,result,m);
     }
   }
   display(result,m);
