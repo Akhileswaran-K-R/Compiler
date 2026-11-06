@@ -1,0 +1,1 @@
+Generate a YACC specification to recognize a valid identifier which starts with a letter followed by any number of letters or digits.
